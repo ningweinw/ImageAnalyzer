@@ -40,7 +40,7 @@ class OpenAIService:
 
         prompt = (
             "Analyze this image and respond in markdown with exactly these sections: \n"
-            "## Overall description\n"
+            "## Description\n"
             "## Identified location\n"
             "## Main objects identified in the image\n"
             "## Texts observed in the image\n"

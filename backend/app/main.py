@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import socket
 import uuid
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -80,7 +81,10 @@ async def analyze_image(image: UploadFile = File(...)) -> dict:
 
 @app.get("/api/health")
 async def health() -> dict:
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "serverHostname": socket.gethostname(),
+    }
 
 
 FRONTEND_DIST = pathlib.Path(__file__).resolve().parents[2] / "frontend" / "dist"

@@ -65,10 +65,36 @@ function normalizeAnalysisMarkdown(rawText) {
 }
 
 function App() {
+  const [runtimeHostname, setRuntimeHostname] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [analysisMarkdown, setAnalysisMarkdown] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadServerInfo = async () => {
+      try {
+        const response = await fetch("/api/health");
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.serverHostname || !isMounted) {
+          return;
+        }
+
+        setRuntimeHostname(String(payload.serverHostname));
+      } catch {
+        // Keep fallback text when hostname cannot be retrieved.
+      }
+    };
+
+    loadServerInfo();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const previewUrl = useMemo(() => {
     if (!selectedFile) {
@@ -162,7 +188,9 @@ function App() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-10">
       <section className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl backdrop-blur-sm">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Image Analyzer</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+          Image Analyzer ({runtimeHostname || "unknown-host"})
+        </h1>
         <p className="mt-2 text-sm text-slate-600">
           Upload a JPG or PNG image and generate a detailed markdown analysis using Azure OpenAI.
         </p>
